@@ -1,0 +1,122 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+
+local SIZE, range, on, acc = 240, 500, true, 0
+local R = SIZE / 2
+
+local env = getgenv and getgenv() or _G
+if env.RadarCleanup then pcall(env.RadarCleanup) end
+local conns = {}
+
+local okHui, hui = pcall(function() return gethui and gethui() end)
+local parent = (okHui and hui) or lp:WaitForChild("PlayerGui")
+local old = parent:FindFirstChild("RadarUI")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "RadarUI"; gui.ResetOnSpawn = false; gui.DisplayOrder = 997
+gui.Parent = parent
+
+local disc = Instance.new("Frame", gui)
+disc.Size = UDim2.fromOffset(SIZE, SIZE); disc.Position = UDim2.new(0, 20, 0, 90)
+disc.BackgroundColor3 = Color3.fromRGB(255, 240, 247); disc.ClipsDescendants = true
+Instance.new("UICorner", disc).CornerRadius = UDim.new(1, 0)
+local stroke = Instance.new("UIStroke", disc)
+stroke.Color = Color3.fromRGB(255, 150, 200); stroke.Thickness = 2
+
+local function ring(frac)
+    local r = Instance.new("Frame", disc)
+    r.AnchorPoint = Vector2.new(0.5, 0.5); r.Position = UDim2.fromScale(0.5, 0.5)
+    r.Size = UDim2.fromScale(frac, frac); r.BackgroundTransparency = 1
+    Instance.new("UICorner", r).CornerRadius = UDim.new(1, 0)
+    local st = Instance.new("UIStroke", r)
+    st.Color = Color3.fromRGB(255, 170, 210); st.Thickness = 1
+end
+for _, fr in ipairs({ 0.33, 0.66, 0.98 }) do ring(fr) end
+for _, sz in ipairs({ UDim2.new(1, 0, 0, 1), UDim2.new(0, 1, 1, 0) }) do
+    local l = Instance.new("Frame", disc)
+    l.AnchorPoint = Vector2.new(0.5, 0.5); l.Position = UDim2.fromScale(0.5, 0.5)
+    l.Size = sz; l.BorderSizePixel = 0; l.BackgroundColor3 = Color3.fromRGB(255, 170, 210)
+end
+
+local tip = Instance.new("TextLabel", gui)
+tip.Position = UDim2.new(0, 20, 0, 90 + SIZE + 6); tip.Size = UDim2.fromOffset(SIZE, 38)
+tip.BackgroundColor3 = Color3.fromRGB(255, 240, 247); tip.TextColor3 = Color3.fromRGB(0, 0, 0)
+tip.Font = Enum.Font.GothamMedium; tip.TextSize = 13; tip.Visible = false
+Instance.new("UICorner", tip).CornerRadius = UDim.new(0, 8)
+local hov
+
+local function avatar(size, userId, z)
+    local f = Instance.new("ImageLabel", disc)
+    f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.fromOffset(size, size)
+    f.BackgroundColor3 = Color3.fromRGB(255, 218, 236); f.BorderSizePixel = 0; f.ZIndex = z
+    f.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
+    Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0)
+    local s = Instance.new("UIStroke", f)
+    s.Color = Color3.fromRGB(255, 105, 180); s.Thickness = 1.5
+    return f
+end
+avatar(28, lp.UserId, 3).Position = UDim2.fromScale(0.5, 0.5)
+
+local dots = {}
+conns[#conns + 1] = Players.PlayerRemoving:Connect(function(p)
+    if dots[p] then dots[p]:Destroy(); dots[p] = nil end
+end)
+
+conns[#conns + 1] = UIS.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.Semicolon and not UIS:GetFocusedTextBox() then
+        on = not on; disc.Visible = on
+    end
+end)
+
+conns[#conns + 1] = RunService.Heartbeat:Connect(function(dt)
+    acc = acc + dt
+    if acc < 0.05 then return end
+    acc = 0
+    disc.Visible = on
+    if not on then tip.Visible = false end
+    local cam = workspace.CurrentCamera
+    local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if not (on and cam and root) then return end
+    local look = cam.CFrame.LookVector
+    local f = Vector3.new(look.X, 0, look.Z)
+    if f.Magnitude < 0.01 then return end
+    f = f.Unit
+    local right = Vector3.new(-f.Z, 0, f.X)
+    for _, p in ipairs(Players:GetPlayers()) do
+        local hrp = p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+        local d, x, y = dots[p], nil, nil
+        if hrp then
+            local off = hrp.Position - root.Position
+            x, y = off:Dot(right) / range * R, -off:Dot(f) / range * R
+        end
+        if x then
+            if not d then
+                d = avatar(24, p.UserId, 2)
+                d.Active = true
+                d.MouseEnter:Connect(function() hov = p end)
+                d.MouseLeave:Connect(function() if hov == p then hov = nil end end)
+                dots[p] = d
+            end
+            local m, lim = math.sqrt(x * x + y * y), R - 12
+            if m > lim then x, y = x / m * lim, y / m * lim end
+            d.ImageTransparency = m > lim and 0.45 or 0
+            d.Position = UDim2.new(0.5, x, 0.5, y); d.Visible = true
+        elseif d then
+            d.Visible = false
+        end
+    end
+    local hh = hov and hov.Character and hov.Character:FindFirstChild("HumanoidRootPart")
+    tip.Visible = hh ~= nil
+    if hh then
+        local ps = hh.Position
+        tip.Text = string.format("%s\nX %d   Y %d   Z %d   (%dm)", hov.Name, ps.X, ps.Y, ps.Z, (ps - root.Position).Magnitude)
+    end
+end)
+
+env.RadarCleanup = function()
+    for _, c in ipairs(conns) do c:Disconnect() end
+    gui:Destroy()
+end
