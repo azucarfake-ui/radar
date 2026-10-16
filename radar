@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local lp = Players.LocalPlayer
 
-local SIZE, range, on, acc = 240, 500, true, 0
+local SIZE, range, on, acc = 240, 500, false, 0
 local R = SIZE / 2
 
 local env = getgenv and getgenv() or _G
@@ -21,7 +21,7 @@ gui.Parent = parent
 
 local disc = Instance.new("Frame", gui)
 disc.Size = UDim2.fromOffset(SIZE, SIZE); disc.Position = UDim2.new(0, 20, 0, 90)
-disc.BackgroundColor3 = Color3.fromRGB(47, 59, 42); disc.ClipsDescendants = true
+disc.BackgroundColor3 = Color3.fromRGB(47, 59, 42); disc.ClipsDescendants = true; disc.Visible = false
 Instance.new("UICorner", disc).CornerRadius = UDim.new(1, 0)
 local stroke = Instance.new("UIStroke", disc)
 stroke.Color = Color3.fromRGB(107, 143, 78); stroke.Thickness = 2
@@ -119,4 +119,9 @@ end)
 env.RadarCleanup = function()
     for _, c in ipairs(conns) do c:Disconnect() end
     gui:Destroy()
+end
+return function(v)
+    on = v and true or false
+    disc.Visible = on
+    if not on then tip.Visible = false end
 end
