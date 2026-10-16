@@ -21,10 +21,10 @@ gui.Parent = parent
 
 local disc = Instance.new("Frame", gui)
 disc.Size = UDim2.fromOffset(SIZE, SIZE); disc.Position = UDim2.new(0, 20, 0, 90)
-disc.BackgroundColor3 = Color3.fromRGB(255, 240, 247); disc.ClipsDescendants = true
+disc.BackgroundColor3 = Color3.fromRGB(47, 59, 42); disc.ClipsDescendants = true
 Instance.new("UICorner", disc).CornerRadius = UDim.new(1, 0)
 local stroke = Instance.new("UIStroke", disc)
-stroke.Color = Color3.fromRGB(255, 150, 200); stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(107, 143, 78); stroke.Thickness = 2
 
 local function ring(frac)
     local r = Instance.new("Frame", disc)
@@ -32,18 +32,18 @@ local function ring(frac)
     r.Size = UDim2.fromScale(frac, frac); r.BackgroundTransparency = 1
     Instance.new("UICorner", r).CornerRadius = UDim.new(1, 0)
     local st = Instance.new("UIStroke", r)
-    st.Color = Color3.fromRGB(255, 170, 210); st.Thickness = 1
+    st.Color = Color3.fromRGB(88, 110, 76); st.Thickness = 1
 end
 for _, fr in ipairs({ 0.33, 0.66, 0.98 }) do ring(fr) end
 for _, sz in ipairs({ UDim2.new(1, 0, 0, 1), UDim2.new(0, 1, 1, 0) }) do
     local l = Instance.new("Frame", disc)
     l.AnchorPoint = Vector2.new(0.5, 0.5); l.Position = UDim2.fromScale(0.5, 0.5)
-    l.Size = sz; l.BorderSizePixel = 0; l.BackgroundColor3 = Color3.fromRGB(255, 170, 210)
+    l.Size = sz; l.BorderSizePixel = 0; l.BackgroundColor3 = Color3.fromRGB(88, 110, 76)
 end
 
 local tip = Instance.new("TextLabel", gui)
 tip.Position = UDim2.new(0, 20, 0, 90 + SIZE + 6); tip.Size = UDim2.fromOffset(SIZE, 38)
-tip.BackgroundColor3 = Color3.fromRGB(255, 240, 247); tip.TextColor3 = Color3.fromRGB(0, 0, 0)
+tip.BackgroundColor3 = Color3.fromRGB(58, 72, 52); tip.TextColor3 = Color3.fromRGB(226, 232, 208)
 tip.Font = Enum.Font.GothamMedium; tip.TextSize = 13; tip.Visible = false
 Instance.new("UICorner", tip).CornerRadius = UDim.new(0, 8)
 local hov
@@ -51,11 +51,11 @@ local hov
 local function avatar(size, userId, z)
     local f = Instance.new("ImageLabel", disc)
     f.AnchorPoint = Vector2.new(0.5, 0.5); f.Size = UDim2.fromOffset(size, size)
-    f.BackgroundColor3 = Color3.fromRGB(255, 218, 236); f.BorderSizePixel = 0; f.ZIndex = z
+    f.BackgroundColor3 = Color3.fromRGB(74, 92, 66); f.BorderSizePixel = 0; f.ZIndex = z
     f.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
     Instance.new("UICorner", f).CornerRadius = UDim.new(1, 0)
     local s = Instance.new("UIStroke", f)
-    s.Color = Color3.fromRGB(255, 105, 180); s.Thickness = 1.5
+    s.Color = Color3.fromRGB(217, 130, 43); s.Thickness = 1.5
     return f
 end
 avatar(28, lp.UserId, 3).Position = UDim2.fromScale(0.5, 0.5)
