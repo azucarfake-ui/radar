@@ -146,12 +146,15 @@ for _, sz in ipairs({ UDim2.new(1, 0, 0, 1), UDim2.new(0, 1, 1, 0) }) do
 end
 
 -- barrido rojo, como la mirada de Gengar
-local sweep = Instance.new("Frame", disc)
+local spinner = Instance.new("Frame", disc)
+spinner.AnchorPoint = Vector2.new(0.5, 0.5); spinner.Position = UDim2.fromScale(0.5, 0.5)
+spinner.Size = UDim2.fromScale(1, 1); spinner.BackgroundTransparency = 1; spinner.ZIndex = 2
+local sweep = Instance.new("Frame", spinner)
 sweep.AnchorPoint = Vector2.new(0, 0.5); sweep.Position = UDim2.fromScale(0.5, 0.5)
-sweep.Size = UDim2.new(0, R, 0, 2); sweep.BorderSizePixel = 0
-sweep.BackgroundColor3 = EYE; sweep.BackgroundTransparency = 0.35; sweep.ZIndex = 2
+sweep.Size = UDim2.new(0.5, 0, 0, 2); sweep.BorderSizePixel = 0
+sweep.BackgroundColor3 = EYE; sweep.BackgroundTransparency = 0.2; sweep.ZIndex = 2
 local sg = Instance.new("UIGradient", sweep)
-sg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
+sg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0) })
 
 do
 	local face = drawGengarFace(gui, 100, 64, Vector2.new(0.5, 0), UDim2.new(0, 20 + SIZE / 2, 0, 90))
@@ -199,7 +202,7 @@ end)
 
 conns[#conns + 1] = RunService.Heartbeat:Connect(function(dt)
 	angle = (angle + dt * 120) % 360
-	sweep.Rotation = angle
+	spinner.Rotation = angle
 	acc = acc + dt
 	if acc < 0.05 then return end
 	acc = 0
