@@ -5,8 +5,46 @@ local lp = Players.LocalPlayer
 
 local SIZE, range, on, acc, angle = 240, 500, false, 0, 0
 local R = SIZE / 2
+local function drawGengarFace(parent, w, h, anchor, pos)
+	local f = Instance.new("Frame")
+	f.BackgroundTransparency = 1
+	f.AnchorPoint = anchor
+	f.Position = pos
+	f.Size = UDim2.fromOffset(w, h)
+	f.Parent = parent
+	local function box(x, y, bw, bh, col, rot, z, corner)
+		local b = Instance.new("Frame")
+		b.AnchorPoint = Vector2.new(0.5, 0.5)
+		b.Position = UDim2.new(x, 0, y, 0)
+		b.Size = UDim2.new(bw, 0, bh, 0)
+		b.BackgroundColor3 = col
+		b.BorderSizePixel = 0
+		b.Rotation = rot or 0
+		b.ZIndex = z or 2
+		b.Parent = f
+		if corner then local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(corner, 0); c.Parent = b end
+		return b
+	end
+	local BLACK, WHITE, EDGE = Color3.fromRGB(14, 8, 22), Color3.fromRGB(250, 250, 250), Color3.fromRGB(110, 66, 170)
+	local sq = h / w
+	for _, x in ipairs({0.1, 0.9}) do
+		local e = box(x, 0.2, 0.17, 0.17 / sq, BLACK, 45, 1)
+		local s = Instance.new("UIStroke"); s.Color = EDGE; s.Thickness = 1; s.Parent = e
+	end
+	box(0.5, 0.1, 0.12, 0.12 / sq, BLACK, 45, 1)
+	local head = box(0.5, 0.58, 0.96, 0.82, BLACK, 0, 2, 0.28)
+	local hs = Instance.new("UIStroke"); hs.Color = EDGE; hs.Thickness = 1; hs.Parent = head
+	for _, d in ipairs({{0.29, 14}, {0.71, -14}}) do
+		box(d[1], 0.36, 0.28, 0.2, WHITE, d[2], 4, 0.3)
+		box(d[1], 0.36, 0.03, 0.17, BLACK, 0, 5)
+	end
+	box(0.5, 0.74, 0.8, 0.3, WHITE, 0, 3, 0.25)
+	for i = 1, 5 do box(0.1 + i * 0.133, 0.74, 0.012, 0.3, BLACK, 0, 4) end
+	box(0.5, 0.74, 0.8, 0.03, BLACK, 0, 4)
+	return f
+end
 local GENGAR_IMAGE = "" -- pega aqui el id de tu imagen, por ejemplo "rbxassetid://123456789" (PNG con fondo transparente)
-local TOP = GENGAR_IMAGE ~= "" and 160 or 90
+local TOP = 160
 
 local BG, RING = Color3.fromRGB(22, 14, 34), Color3.fromRGB(70, 42, 112)
 local LINE, TXT = Color3.fromRGB(110, 66, 170), Color3.fromRGB(236, 226, 255)
@@ -55,6 +93,11 @@ sweep.BackgroundColor3 = EYE; sweep.BackgroundTransparency = 0.35; sweep.ZIndex 
 local sg = Instance.new("UIGradient", sweep)
 sg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
 
+do
+	local face = drawGengarFace(gui, 100, 64, Vector2.new(0.5, 0), UDim2.new(0, 20 + SIZE / 2, 0, 90))
+	face.Name = "Banner"
+	conns[#conns + 1] = RunService.Heartbeat:Connect(function() face.Visible = on end)
+end
 if GENGAR_IMAGE ~= "" then
 	local img = Instance.new("ImageLabel", gui)
 	img.Name = "Banner"; img.BackgroundTransparency = 1; img.Image = GENGAR_IMAGE; img.ScaleType = Enum.ScaleType.Fit
