@@ -5,6 +5,8 @@ local lp = Players.LocalPlayer
 
 local SIZE, range, on, acc, angle = 240, 500, false, 0, 0
 local R = SIZE / 2
+local GENGAR_IMAGE = "" -- pega aqui el id de tu imagen, por ejemplo "rbxassetid://123456789" (PNG con fondo transparente)
+local TOP = GENGAR_IMAGE ~= "" and 160 or 90
 
 local BG, RING = Color3.fromRGB(22, 14, 34), Color3.fromRGB(70, 42, 112)
 local LINE, TXT = Color3.fromRGB(110, 66, 170), Color3.fromRGB(236, 226, 255)
@@ -24,7 +26,7 @@ gui.Name = "GengarRadarUI"; gui.ResetOnSpawn = false; gui.DisplayOrder = 997
 gui.Parent = parent
 
 local disc = Instance.new("Frame", gui)
-disc.Size = UDim2.fromOffset(SIZE, SIZE); disc.Position = UDim2.new(0, 20, 0, 90)
+disc.Size = UDim2.fromOffset(SIZE, SIZE); disc.Position = UDim2.new(0, 20, 0, TOP)
 disc.BackgroundColor3 = BG; disc.ClipsDescendants = true; disc.Visible = false
 Instance.new("UICorner", disc).CornerRadius = UDim.new(1, 0)
 local stroke = Instance.new("UIStroke", disc)
@@ -53,22 +55,15 @@ sweep.BackgroundColor3 = EYE; sweep.BackgroundTransparency = 0.35; sweep.ZIndex 
 local sg = Instance.new("UIGradient", sweep)
 sg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
 
--- ojos de Gengar arriba (norte)
-local eyes = Instance.new("Frame", disc)
-eyes.BackgroundTransparency = 1; eyes.AnchorPoint = Vector2.new(0.5, 0)
-eyes.Position = UDim2.new(0.5, 0, 0, 6); eyes.Size = UDim2.fromOffset(34, 12); eyes.ZIndex = 4
-for i, side in ipairs({ 1, -1 }) do
-	local e = Instance.new("Frame", eyes)
-	e.AnchorPoint = Vector2.new(0.5, 0.5); e.Position = UDim2.new(i == 1 and 0.25 or 0.75, 0, 0.5, 0)
-	e.Size = UDim2.fromOffset(14, 8); e.BorderSizePixel = 0; e.BackgroundColor3 = EYE; e.Rotation = side * 16; e.ZIndex = 4
-	Instance.new("UICorner", e).CornerRadius = UDim.new(0.45, 0)
-	local p = Instance.new("Frame", e)
-	p.AnchorPoint = Vector2.new(0.5, 0.5); p.Position = UDim2.fromScale(0.5, 0.5)
-	p.Size = UDim2.fromOffset(2, 6); p.BorderSizePixel = 0; p.BackgroundColor3 = Color3.new(1, 1, 1); p.ZIndex = 5
+if GENGAR_IMAGE ~= "" then
+	local img = Instance.new("ImageLabel", gui)
+	img.Name = "Banner"; img.BackgroundTransparency = 1; img.Image = GENGAR_IMAGE; img.ScaleType = Enum.ScaleType.Fit
+	img.Position = UDim2.new(0, 20, 0, 90); img.Size = UDim2.fromOffset(SIZE, 66)
+	conns[#conns + 1] = RunService.Heartbeat:Connect(function() img.Visible = on end)
 end
 
 local tip = Instance.new("TextLabel", gui)
-tip.Position = UDim2.new(0, 20, 0, 90 + SIZE + 6); tip.Size = UDim2.fromOffset(SIZE, 38)
+tip.Position = UDim2.new(0, 20, 0, TOP + SIZE + 6); tip.Size = UDim2.fromOffset(SIZE, 38)
 tip.BackgroundColor3 = PANEL; tip.TextColor3 = TXT
 tip.Font = Enum.Font.GothamMedium; tip.TextSize = 13; tip.Visible = false
 Instance.new("UICorner", tip).CornerRadius = UDim.new(0, 8)
